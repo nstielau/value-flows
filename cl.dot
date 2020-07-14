@@ -1,0 +1,124 @@
+/*
+Value Stream Mapping for Container Linux team.
+
+TODO:
+* Feedback on bianries?  Goes to sysadmins or hosts? or both?
+
+*/
+
+digraph G {
+  rankdir=LR;
+  ranksep=1;
+  size=15;
+  node [margin=0.25 width=0.5 sep=110 shape=egg style=filled];
+
+  ///////////////////////////
+  // Us (stuff in the middle)
+  cl [shape=circle label="" style=empty image="logo.png" width="0.1" labelloc=t margin=0]
+
+  //////////////////////////////////////////////////
+  // Producers of CL inputs (stuff of the left side)
+  node[shape=egg style=filled color="#449fd8"];
+  support_p [label="Support/SE/FE"];
+  tectonic_p [label="Tectonic teams"];
+
+  node[shape=egg style=filled color="#cccccc"];
+  sysadmins_p [label="Sysadmins"];
+  hosts_p [label="Hosts"];
+  gentoo_p [label="Gentoo upstream"]
+  cloud_oem_p [label="Cloud Providers\nOEM"]
+
+
+  ////////////////////////////////////////////////////
+  // Consumers of CL outputs (stuff of the right side)
+
+  // Internal to CoreOS
+  node[shape=egg style=filled color="#449fd8"];
+  support_c [label="Support/SE/FE"];
+  tectonic_c [label="Tectonic teams"];
+  
+  // External to CoreOS
+  node[shape=egg style=filled color="#cccccc"];
+  hosts_c [label="Hosts"];
+  sysadmins_c [label="Sysadmins"];
+  cloud_oem_c [label="Cloud Providers\nOEM"]
+
+  ////////////////////////////
+  // Interfaces
+
+  // External to CoreOS
+  node [shape=record style=empty color="black"];
+  google_groups [label="{{<dev>Dev List|<user>User List}| Google\nGroups}" margin=0.1];
+  google_groups_c [label="{{<announce>Announce List}| Google\nGroups}" margin=0.1 style="dashed"];
+  cloud_providers [label="{Clouds|{GCP|AWS|Azure}}" margin=0.1];
+  binaries [label="Github?? Binaries"];
+  docs [label="Documentation"];
+  github_issues [label="Github\nIssues"];
+  gentoo_codebase [label="Gentoo\nCodebase"];
+  cloud_oem_portal_c [label="{OEM\nPortal|{GCP|AWS|Azure}}" margin=0.1];
+
+  // Internal to CoreOS
+  node [shape=record style=empty color="#449fd8"]
+  roller_c [label="Roller / TBD" style="dashed"];
+  roller_p [label="Roller"];
+  kb [label="Internal\nDocumentation" style="dashed"];
+  internal_ticketing_p [label="Internal\nTicketing" style="dashed"];
+  internal_ticketing [label="Internal\nTicketing" style="dashed"];
+  email [label="EMAIL??"]
+
+////////////////////////////////
+// Edges (lines between things)
+
+// CL <=> Tectonic
+cloud_providers -> tectonic_c;
+tectonic_p -> internal_ticketing_p [label="Feature Requests"]
+internal_ticketing_p -> cl
+
+// CoreOS Support Team, FE, SE
+support_p -> internal_ticketing_p [label="Support Requests"]
+cl -> internal_ticketing [label="Eaxpertise"]
+cl -> kb [label="Recommendations"]
+kb -> support_c
+internal_ticketing -> support_c
+
+// Hosts
+cl -> cloud_providers [label="Features\n&\nImprovements"]
+cloud_providers -> hosts_c
+hosts_p -> roller_c [label="Usage Metrics"]
+roller_c -> cl
+cl -> roller_p
+roller_p -> hosts_c
+
+// External Sysadmins
+sysadmins_p -> google_groups:user [label="Feature Request"]
+sysadmins_p -> google_groups:user [label="Support Request"]
+google_groups -> cl
+google_groups -> cl
+google_groups -> cl
+sysadmins_p -> github_issues [label="Bug Reports"]
+sysadmins_p -> github_issues [label="Pull Requests"]
+cl -> binaries [label="Features\n&\nImprovements"]
+binaries -> sysadmins_c
+
+github_issues -> cl
+cloud_providers -> sysadmins_c
+cl -> docs [label="Documentation"]; docs -> sysadmins_c
+
+// Upstream
+gentoo_p -> gentoo_codebase [label="Features\n&\nImprovements"]
+gentoo_codebase -> cl
+
+// Cloud OEM
+
+cl -> cloud_oem_portal_c [label="Recommendations\n&\nFeature Requests???"]
+cloud_oem_portal_c -> cloud_oem_c
+
+cloud_oem_p -> email [label="Feature Requests"]
+email -> cl
+
+
+// Announce List
+cl -> google_groups_c [label="Actionable\nAnnouncements"]
+google_groups_c:annouce -> sysadmins_c
+}
+

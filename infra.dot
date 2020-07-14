@@ -1,0 +1,59 @@
+digraph {
+  rankdir=LR;
+  ranksep=1;
+  size=15;
+
+  // Us
+  node [margin=0.25 width=0.5 sep=110 shape=circle style=filled];
+  infra [label="INFRA" image="coreos.png" margin=0 fixedsize=true width=2];
+
+  // Internal teams we consume from
+  node[shape=egg style=filled color="#449fd8" width=2.5];  
+  tectonic_p [label="Tectonic\nTeams"];
+  it_p [label="IT"];
+  systems_p [label="Systems" shape="rectangle"];
+  support_p [label="Support/FE/SE"];
+
+  // Internal teams we produce for
+  node[shape=egg style=filled color="#449fd8" width=2.5];  
+  tectonic_c [label="Tectonic\nTeams"];
+  it_c [label="IT" width=2]
+  systems_p [label="Systems"]
+  support_c [label="Support/FE/SE"]
+
+  
+  // Interfaces
+  node [shape=record style=empty color="black" width=""];
+  jira_p [label="JIRA"]
+  jira_c [label="JIRA"]
+  update_server_p [label="Update\nServer"]
+  alerting_p [label="{Alerting|{PagerDuty|VictorOps}}" margin=0.1]
+  product_feedback_c [label="Formal\nFeedback\nMechanism\nTBD" style="dashed"]
+  kb_c [label="Knolwedge Base" style="dashed"]
+  tools_c [label="{Supported\nServices|{ELK|Prometheus|K8S|VPN}}" margin=0.1]
+  platforms_c [label="{Cloud\nPlatforms\n&\nServices|{AWS|GCP|JumpCloud|Github}}" margin=0.1]
+  
+
+
+  // Consume
+  tectonic_p -> jira_p [label="Requests"];
+  systems_p -> alerting_p [label="Alerts"]; alerting_p -> infra
+  tectonic_p -> update_server_p [label="Tectonic\nUpdates"]; update_server_p -> infra
+  it_p -> jira_p [label="Support Recommendations"]; 
+  it_p -> jira_p [label="Escalations"]; 
+  jira_p -> infra
+  support_p -> jira_p [label="Support Requests"];
+  support_p -> jira_p [label="Recommendation Requests"];
+
+  // Produce
+  infra -> kb_c; kb_c -> support_c [label="Expertise\n&\nRecommendations"]  
+  kb_c -> it_c [label="Expertise\n&\nRecommendations"]  
+  infra -> product_feedback_c;
+  product_feedback_c -> tectonic_c [label="Product\nFeedback"]
+  infra -> jira_c;
+  jira_c -> tectonic_c [label="Expertise"]  
+  infra -> tools_c; 
+  tools_c -> tectonic_c [label="Access & Usage"]
+  platforms_c -> tectonic_c [label="Permissions, Accounts"]  
+  platforms_c -> it_c [label="Permissions, Accounts"]
+}
